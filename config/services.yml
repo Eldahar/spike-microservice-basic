@@ -1,0 +1,41 @@
+parameters:
+  worker.command.class: Microservice\CoreBundle\Command\Worker
+  first.processor.class: Microservice\ProcessorBundle\Processor\FirstProcessor
+  rabbitmq.driver.class: Microservice\CoreBundle\Driver\RabbitMQDriver
+  register.employee.handler.class: Microservice\CoreBundle\Handler\RegisterEmployeeHandler
+  quick.matching.handler.class: Microservice\CoreBundle\Handler\QuickMatchingHandler
+  full.matching.handler.class: Microservice\CoreBundle\Handler\FullMatchingHandler
+  error.handler.class: Microservice\CoreBundle\Handler\ErrorHandler
+
+  maximum.message.count: 100
+  maximum.message.read: 10
+
+services:
+  worker.command:
+    class: %worker.command.class%
+    arguments:
+      - "@first.processor"
+      - "@rabbitmq.driver"
+      - "@error.handler"
+      - %maximum.message.count%
+      - %maximum.message.read%
+
+  first.processor:
+    class: %first.processor.class%
+    arguments:
+      - "@full.matching.handler"
+
+  rabbitmq.driver:
+    class: %rabbitmq.driver.class%
+
+  register.employee.handler:
+    class: %register.employee.handler.class%
+
+  quick.matching.handler:
+    class: %quick.matching.handler.class%
+
+  full.matching.handler:
+    class: %full.matching.handler.class%
+
+  error.handler:
+    class: %error.handler.class%
